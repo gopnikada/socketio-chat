@@ -8,6 +8,7 @@ const io = socketio(server)
 
 const PORT = process.env.PORT || 5000
 const router = require('./router')
+const {addUser, removeUser, usersInRoom, getUser} = require('./users')
 
 io.on('connection', socket =>{
     console.log('got new connection')

@@ -26,8 +26,13 @@ const Chat = ({location}) =>{
         socket.emit('join', {name, room}, ({status})=>{
             console.log(status)
         })
+        return ()=>{
+            socket.emit('disconnect')
 
-    }, [ENDPOINT, location.search])
+            socket.off()
+        }
+
+    }, [ENDPOINT, location.search])//todo firying log twice
 
     return (
         <h1>Chat</h1>
