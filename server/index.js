@@ -11,12 +11,21 @@ const router = require('./router')
 const {addUser, removeUser, usersInRoom, getUser} = require('./users')
 
 io.on('connection', socket =>{
-    console.log('got new connection')
-
     socket.on('join', ({name, room}, callback)=>{
-        console.log(`recieved name: ${name}, recieved room:${room}`)
+        const {error, user} = addUser({id: socket.id, room, name})
+        if(error) return callback(error)
 
-        callback({status: 'Data was got'})
+        socket.emit('message',{user: 'admin', text: `${user.name}, wellcome to room ${user.room}`})
+        socket.broadcast.to(user.room).emit('message', {user:'admin', text:`${user.name} has joined`})
+
+        socket.join(user.room)
+        callback()
+    })
+    socket.on('sendMessage',(message, callback)=>{
+        const user = getUser(socket.id)
+        io.to(user.room).emit('message', {user: user.name, text:message})
+        callback()
+
     })
 
     socket.on('disconnect',()=>{

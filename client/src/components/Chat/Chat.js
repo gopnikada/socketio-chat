@@ -7,6 +7,8 @@ let socket;
 const Chat = ({location}) =>{
     const [name, setName] = useState('')
     const [room, setRoom] = useState('')
+    const [messages, setMessages] = useState([])
+    const [message, setMessage] = useState('')
     const ENDPOINT = 'localhost:5000'
     useEffect(()=>{
         let connectionOptions =  {
@@ -23,8 +25,8 @@ const Chat = ({location}) =>{
         setName(name)
         setRoom(room)
 
-        socket.emit('join', {name, room}, ({status})=>{
-            console.log(status)
+        socket.emit('join', {name, room}, ({error})=>{
+            console.log(error)
         })
         return ()=>{
             socket.emit('disconnect')
@@ -34,8 +36,28 @@ const Chat = ({location}) =>{
 
     }, [ENDPOINT, location.search])//todo firying log twice
 
+    useEffect(()=>{
+        socket.on('message', (message)=>{
+            setMessages([...messages, message])//adding a message to messages arr
+        })
+    }, [messages])
+
+    //function for sending messages
+    const sendMessage = (event)=>{
+        event.preventDefault()
+        if(message){
+            socket.emit('sendMessage', message, ()=>{setMessage('')})
+        }
+    }
+
     return (
-        <h1>Chat</h1>
+        <div className="outerContainer">
+            <div className="container">
+                <input value={message}
+                onChange={event=>setMessage(event.target.value)}
+                onKeyPress={event=>event.key === 'Enter' ? sendMessage(event): null}/>
+            </div>
+        </div>
     )
 }
 
