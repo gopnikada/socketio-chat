@@ -22,7 +22,11 @@ const Chat = ({location}) =>{
 
         setName(name)
         setRoom(room)
-        console.log(socket)
+
+        socket.emit('join', {name, room}, ({status})=>{
+            console.log(status)
+        })
+
     }, [ENDPOINT, location.search])
 
     return (
